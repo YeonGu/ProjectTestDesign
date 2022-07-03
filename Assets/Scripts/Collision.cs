@@ -17,16 +17,19 @@ public class Collision : MonoBehaviour
     public bool rightCollided;
     public bool leftCollided;
     public bool inAir;
+    public bool collided;
     
     [Space] 
     public bool groundLeave;
     public bool groundTouch;
 
     private bool justGrounded;
+    private Movement _movement;
 
     // Start is called before the first frame update
     void Start()
     {
+        _movement = GetComponent<Movement>();
         justGrounded = false;
         isGrounded = false;
     }
@@ -39,6 +42,15 @@ public class Collision : MonoBehaviour
 
     private void Detection()
     {
+        CollisionAssignment();
+        if (groundTouch)
+        {
+            _movement.ResetJump();
+        }
+    }
+
+    private void CollisionAssignment()
+    {
         justGrounded = isGrounded;  //Last Frame
         //basic detect
         Vector2 ori = transform.position;
@@ -49,6 +61,7 @@ public class Collision : MonoBehaviour
         groundTouch = !justGrounded && isGrounded;
         groundLeave = justGrounded && !isGrounded;
         inAir = !isGrounded && !rightCollided && !leftCollided;
+        collided = !inAir;
     }
 
     private void OnDrawGizmos()

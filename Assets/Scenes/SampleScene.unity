@@ -1619,9 +1619,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 9
   jumpSpeed: 13
+  maxJumpTimes: 2
   canWalk: 0
   isJumping: 0
   isWalking: 0
+  jumpCount: 0
 --- !u!50 &1075624439
 Rigidbody2D:
   serializedVersion: 4
@@ -1695,6 +1697,7 @@ MonoBehaviour:
   rightCollided: 0
   leftCollided: 0
   inAir: 0
+  collided: 0
   groundLeave: 0
   groundTouch: 0
 --- !u!114 &1075624443
