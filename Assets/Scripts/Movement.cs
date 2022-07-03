@@ -19,15 +19,17 @@ public class Movement : MonoBehaviour
     private float inputX, inputY;
     private Vector2 finalVelocity;
 
-    private Rigidbody2D _rigidbody;
-    private SpriteRenderer _spriteRenderer;
+    private Rigidbody2D rb;
+    private SpriteRenderer sprite;
     private Collision collision;
+    private PlayerAnime anime;
 
     private void Start()
     {
+        anime = GetComponent<PlayerAnime>();
         collision = GetComponent<Collision>();
-        _spriteRenderer = GetComponent<SpriteRenderer>();
-        _rigidbody = GetComponent<Rigidbody2D>();
+        sprite = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
         canWalk = true;
     }
 
@@ -46,19 +48,21 @@ public class Movement : MonoBehaviour
             Jump(jumpSpeed);
         }
 
-        _rigidbody.velocity = finalVelocity;
+        rb.velocity = finalVelocity;
 
         //flip control
-        if (_rigidbody.velocity.x > 0) _spriteRenderer.flipX = false;
-        if (_rigidbody.velocity.x < 0) _spriteRenderer.flipX = true;
+        if (inputX > 0) sprite.flipX = false;
+        if (inputX < 0) sprite.flipX = true;
     }
     
     //Components
     private void Walk(float spd)
     {
-        var v = _rigidbody.velocity;
+        Vector2 v = rb.velocity;
         v.x = inputX*spd;
         finalVelocity = v;
+        
+        anime.SetRun(v.x != 0 && collision.isGrounded);
     }
 
     private void Jump(float jumpSpd)
