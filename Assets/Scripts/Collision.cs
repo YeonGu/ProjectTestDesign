@@ -16,6 +16,7 @@ public class Collision : MonoBehaviour
     public bool isGrounded;
     public bool rightCollided;
     public bool leftCollided;
+    public bool inAir;
     
     [Space] 
     public bool groundLeave;
@@ -34,8 +35,6 @@ public class Collision : MonoBehaviour
     void Update()
     {
         Detection();
-        
-
     }
 
     private void Detection()
@@ -49,6 +48,7 @@ public class Collision : MonoBehaviour
 
         groundTouch = !justGrounded && isGrounded;
         groundLeave = justGrounded && !isGrounded;
+        inAir = !isGrounded && !rightCollided && !leftCollided;
     }
 
     private void OnDrawGizmos()
