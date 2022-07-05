@@ -22,7 +22,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "rider.run.widget.enabled.cache": "false",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -65,6 +65,7 @@
       <option name="presentableId" value="Default" />
       <updated>1656864755703</updated>
       <workItem from="1656864765153" duration="902000" />
+      <workItem from="1657033211831" duration="5394000" />
     </task>
     <servers />
   </component>

@@ -54,9 +54,10 @@ public class Collision : MonoBehaviour
         justGrounded = isGrounded;  //Last Frame
         //basic detect
         Vector2 ori = transform.position;
-        isGrounded = Physics2D.OverlapBox(ori + bottomOffset, bottomSize, 0,3);
-        rightCollided = Physics2D.OverlapBox(ori + rightOffset, rightSize, 0,3);
-        leftCollided = Physics2D.OverlapBox(ori + leftOffset, leftSize, 0,3);
+        LayerMask mask=LayerMask.GetMask("Structure");
+        isGrounded = Physics2D.OverlapBox(ori + bottomOffset, bottomSize, 0,mask);
+        rightCollided = Physics2D.OverlapBox(ori + rightOffset, rightSize, 0,mask);
+        leftCollided = Physics2D.OverlapBox(ori + leftOffset, leftSize, 0,mask);
 
         groundTouch = !justGrounded && isGrounded;
         groundLeave = justGrounded && !isGrounded;
