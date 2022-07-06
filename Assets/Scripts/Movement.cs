@@ -24,9 +24,11 @@ public class Movement : MonoBehaviour
     private SpriteRenderer sprite;
     private Collision collision;
     private PlayerAnime anime;
+    private Attack _attack;
 
     private void Start()
     {
+        _attack = GetComponent<Attack>();
         anime = GetComponent<PlayerAnime>();
         collision = GetComponent<Collision>();
         sprite = GetComponent<SpriteRenderer>();
@@ -38,9 +40,13 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //initialize
+        finalVelocity = rb.velocity;
         inputX = Input.GetAxis("Horizontal");
         inputY = Input.GetAxis("Vertical");
-
+        
+        if (rb.velocity.y > 0) canWalk = false;
+        else canWalk = true;
         if (canWalk)
         {
             Walk(walkSpeed);
@@ -51,8 +57,11 @@ public class Movement : MonoBehaviour
             jumpCount++;
         }
 
+        if(Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            Dash(transform.position, (Vector2)transform.position+Vector2.right,_attack.dashDistance);
+        }
         rb.velocity = finalVelocity;
-
         Flip();
     }
     
@@ -69,6 +78,16 @@ public class Movement : MonoBehaviour
     private void Jump(float jumpSpd)
     {
         finalVelocity.y = jumpSpd;
+        print("jump");
+    }
+
+    public void Dash(Vector2 ori,Vector2 target, float distance)
+    {
+        Vector2 direction = target - ori;
+        direction.Normalize();
+        Vector2 delta = direction * distance;
+        transform.position = (Vector2)transform.position + delta;
+        //finalVelocity.x = 50f;
     }
 
     private void Flip()

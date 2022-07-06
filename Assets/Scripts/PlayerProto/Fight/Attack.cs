@@ -6,6 +6,8 @@ using UnityEngine;
 public class Attack : MonoBehaviour
 {
     [SerializeField] private float maxFlashDistance;
+
+    public float dashDistance;
     // Start is called before the first frame update
     void Start()
     {
@@ -38,7 +40,7 @@ public class Attack : MonoBehaviour
             if(i.collider.CompareTag("Structure")) return;
             if (i.collider.transform == target)
             {
-                print(111);
+                //print(111);
                 break;
             }
         }
