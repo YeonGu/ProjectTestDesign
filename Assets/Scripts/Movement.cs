@@ -13,7 +13,7 @@ public class Movement : MonoBehaviour
     [SerializeField] private float climbSpeed;
     [SerializeField] private int maxJumpTimes;
     [SerializeField] private float wallJumpSpeed;
-    [SerializeField] private float wallFallSpeed;
+    [SerializeField] private float wallFallSpeed = 3f;
 
     [Space] [Header("Status")] 
     [SerializeField] private bool canWalk;
