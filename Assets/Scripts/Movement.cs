@@ -13,6 +13,7 @@ public class Movement : MonoBehaviour
     [SerializeField] private float climbSpeed;
     [SerializeField] private int maxJumpTimes;
     [SerializeField] private float wallJumpSpeed;
+    [SerializeField] private float wallFallSpeed;
 
     [Space] [Header("Status")] 
     [SerializeField] private bool canWalk;
@@ -75,10 +76,6 @@ public class Movement : MonoBehaviour
             jumpCount++;
         }
 
-        /*if(Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            Dash(transform.position, (Vector2)transform.position+Vector2.right,attack.dashDistance);
-        }*/
         rb.velocity = finalVelocity;
         Flip();
     }
@@ -101,10 +98,12 @@ public class Movement : MonoBehaviour
 
     private void WallGrab()
     {
+        //Lock Position, g
         rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         rb.gravityScale = 0;
         var v = rb.velocity;
-        v.y = inputY*climbSpeed;
+        //v.y = inputY*climbSpeed;
+        v.y = wallFallSpeed;
         rb.velocity = v;
 
         if (Input.GetButtonDown("Jump"))
