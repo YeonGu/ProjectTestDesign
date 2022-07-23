@@ -21,6 +21,7 @@ public class Movement : MonoBehaviour
     [SerializeField] private bool isWalking;
     [SerializeField] private int jumpCount;
     [SerializeField] private bool wallGrab;
+    [SerializeField] private bool useNormalWalk;
 
     private float inputX, inputY;
     private Vector2 finalVelocity;
@@ -42,6 +43,7 @@ public class Movement : MonoBehaviour
         canWalk = true;
         jumpCount = 0;
         defaultGravity = rb.gravityScale;
+        useNormalWalk = true;
     }
 
     // Update is called once per frame
@@ -49,9 +51,10 @@ public class Movement : MonoBehaviour
     {
         //initialize
         finalVelocity = rb.velocity;
-        inputX = Input.GetAxis("Horizontal");
-        inputY = Input.GetAxis("Vertical");
+        GetAxis();
         
+        if (!useNormalWalk) { return; }
+        //check--On the wall
         if (collision.onWall && !collision.isGrounded)
         {
             canWalk = false;
@@ -59,11 +62,11 @@ public class Movement : MonoBehaviour
             wallGrab = true;
             return;
         }
-
+//This need rewrite
         if (rb.velocity.y > 0.1f) canWalk = false;
         else canWalk = true;
 
-        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        ResetConstraints();
         wallGrab = false;
         rb.gravityScale = defaultGravity;
         if (canWalk)
@@ -137,6 +140,11 @@ public class Movement : MonoBehaviour
         }
     }
 
+    public void SetMove(bool isWalkValid)
+    {
+        useNormalWalk = isWalkValid;
+    }
+
     public void Dash(Vector2 ori,Vector2 target, float distance)
     {
         Vector2 direction = target - ori;
@@ -146,16 +154,26 @@ public class Movement : MonoBehaviour
         //finalVelocity.x = 50f;
     }
 
+    
+
+    public void ResetJump()
+    {
+        jumpCount = 0;
+    }
     private void Flip()
     {
         //flip control
         if (inputX > 0) sprite.flipX = false;
         if (inputX < 0) sprite.flipX = true;
     }
-
-    public void ResetJump()
+    private void ResetConstraints()
     {
-        jumpCount = 0;
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
-    
+
+    private void GetAxis()
+    {
+        inputX = Input.GetAxis("Horizontal");
+        inputY = Input.GetAxis("Vertical");
+    }
 }
