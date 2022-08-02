@@ -51,20 +51,16 @@ public class Movement : MonoBehaviour
     {
         //initialize
         finalVelocity = rb.velocity;
-        GetAxis();
-        
         if (!useNormalWalk) { return; }
-        //check--On the wall
+        GetAxis();
+
+        //check == if On the wall, grab
         if (collision.onWall && !collision.isGrounded)
         {
-            canWalk = false;
             WallGrab();
             wallGrab = true;
             return;
         }
-//This need rewrite
-        if (rb.velocity.y > 0.1f) canWalk = false;
-        else canWalk = true;
 
         ResetConstraints();
         wallGrab = false;
@@ -78,8 +74,8 @@ public class Movement : MonoBehaviour
             Jump(jumpSpeed);
             jumpCount++;
         }
-
-        rb.velocity = finalVelocity;
+        if(canWalk)
+            rb.velocity = finalVelocity;
         Flip();
     }
     
@@ -96,7 +92,7 @@ public class Movement : MonoBehaviour
     private void Jump(float jumpSpd)
     {
         finalVelocity.y = jumpSpd;
-        print("jump");
+        // print("jump");
     }
 
     private void WallGrab()
@@ -104,9 +100,12 @@ public class Movement : MonoBehaviour
         //Lock Position, g
         rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         rb.gravityScale = 0;
+        canWalk = false;
         var v = rb.velocity;
-        //v.y = inputY*climbSpeed;
-        v.y = wallFallSpeed;
+        if (inputY > 0) 
+            v.y = 0;
+        else
+            v.y = wallFallSpeed;
         rb.velocity = v;
 
         if (Input.GetButtonDown("Jump"))
@@ -117,27 +116,24 @@ public class Movement : MonoBehaviour
 
     private void WallJump()
     {
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        Vector2 dir = Vector2.zero;
+
         if (collision.rightCollided && !collision.leftCollided)
         {
-            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-            Vector2 dir = Vector2.up + Vector2.left;
-            dir.Normalize();
-            transform.position =(Vector3)(dir*0.2f)+transform.position;
-            dir *= wallJumpSpeed;
-            rb.velocity = dir;
-            return;
+            dir = Vector2.up + Vector2.left;
         }
-
         if (collision.leftCollided && !collision.rightCollided)
         {
-            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-            Vector2 dir = Vector2.up + Vector2.right;
-            dir.Normalize();
-            transform.position = (Vector3) (dir * 0.2f) + transform.position;
-            dir *= wallJumpSpeed;
-            rb.velocity = dir;
-            
+            dir = Vector2.up + Vector2.right;
         }
+
+        StartCoroutine(WallJumpControl());
+        dir.Normalize();
+        transform.position =(Vector3)(dir*0.2f)+transform.position;
+        
+        dir *= wallJumpSpeed;
+        rb.velocity = dir;
     }
 
     public void SetMove(bool isWalkValid)
@@ -175,5 +171,14 @@ public class Movement : MonoBehaviour
     {
         inputX = Input.GetAxis("Horizontal");
         inputY = Input.GetAxis("Vertical");
+    }
+
+    IEnumerator WallJumpControl()
+    {
+        canWalk = false; print("cannot");
+        yield return 0;
+        yield return new WaitUntil(() => rb.velocity.y <= 0.1f);
+        canWalk = true; print("can");
+        yield break;
     }
 }
