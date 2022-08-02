@@ -13,7 +13,8 @@ public class Movement : MonoBehaviour
     [SerializeField] private float climbSpeed;
     [SerializeField] private int maxJumpTimes;
     [SerializeField] private float wallJumpSpeed;
-    [SerializeField] private float wallFallSpeed = 3f;
+    [SerializeField] private float wallFallSpeed;
+    [SerializeField] private float wallSlideSpeed = -3f;
 
     [Space] [Header("Status")] 
     [SerializeField] private bool canWalk;
@@ -32,9 +33,11 @@ public class Movement : MonoBehaviour
     private Collision collision;
     private PlayerAnime anime;
     private Attack attack;
+    private BetterJump betterJump;
 
     private void Start()
     {
+        betterJump = GetComponent<BetterJump>();
         attack = GetComponent<Attack>();
         anime = GetComponent<PlayerAnime>();
         collision = GetComponent<Collision>();
@@ -64,6 +67,7 @@ public class Movement : MonoBehaviour
 
         ResetConstraints();
         wallGrab = false;
+        
         rb.gravityScale = defaultGravity;
         if (canWalk)
         {
@@ -92,7 +96,7 @@ public class Movement : MonoBehaviour
     private void Jump(float jumpSpd)
     {
         finalVelocity.y = jumpSpd;
-        // print("jump");
+        // betterJump.IncreaseJumpGravity();
     }
 
     private void WallGrab()
@@ -100,16 +104,20 @@ public class Movement : MonoBehaviour
         //Lock Position, g
         rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         rb.gravityScale = 0;
-        canWalk = false;
         var v = rb.velocity;
+        
         if (inputY > 0) 
             v.y = 0;
+        else if (inputY<0)
+            v.y = wallFallSpeed - (wallSlideSpeed * inputY);  //负负得正
         else
             v.y = wallFallSpeed;
+        
         rb.velocity = v;
 
         if (Input.GetButtonDown("Jump"))
         {
+            canWalk = false;
             WallJump();
         }
     }
@@ -177,7 +185,7 @@ public class Movement : MonoBehaviour
     {
         canWalk = false; print("cannot");
         yield return 0;
-        yield return new WaitUntil(() => rb.velocity.y <= 0.1f);
+        yield return new WaitUntil(() => rb.velocity.y <= 0f);
         canWalk = true; print("can");
         yield break;
     }

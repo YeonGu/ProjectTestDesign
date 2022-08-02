@@ -8,12 +8,14 @@ public class BetterJump : MonoBehaviour
 {
     [SerializeField] private float fallDownMultiple;
     [SerializeField] private float looseJumpMultiple;
+    private Collision collision;
 
     private Rigidbody2D rb;
     private float gravity=-9.81f;
     // Start is called before the first frame update
     void Start()
     {
+        collision = GetComponent<Collision>();
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -36,4 +38,30 @@ public class BetterJump : MonoBehaviour
         }
     }
 
+    public void IncreaseJumpGravity()
+    {
+        StartCoroutine(JumpGra());
+    }
+
+    IEnumerator JumpGra()
+    {
+        if (rb.velocity.y <= 0)
+        {
+            yield break;
+        }
+
+        yield return new WaitUntil(() => Input.GetButtonUp("Jump"));    //松开跳跃
+        while (true)
+        {
+            Vector2 w = rb.velocity;
+            w.y = gravity * Time.deltaTime * (looseJumpMultiple - 1) + w.y;
+            rb.velocity = w;
+            yield return 0;
+
+            if (collision.collided || rb.velocity.y<=0)
+            {
+                yield break;
+            }
+        }
+    }
 }
