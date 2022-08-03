@@ -52,6 +52,7 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Transform[] center = GetComponentsInChildren<Transform>();
         //initialize
         finalVelocity = rb.velocity;
         if (!useNormalWalk) { return; }
@@ -183,10 +184,10 @@ public class Movement : MonoBehaviour
 
     IEnumerator WallJumpControl()
     {
-        canWalk = false; print("cannot");
+        canWalk = false;
         yield return 0;
         yield return new WaitUntil(() => rb.velocity.y <= 0f);
-        canWalk = true; print("can");
+        canWalk = true;
         yield break;
     }
 }
