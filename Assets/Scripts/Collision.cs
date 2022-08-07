@@ -43,10 +43,10 @@ public class Collision : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Detection();
+        DetectCollide();
     }
 
-    private void Detection()
+    private void DetectCollide()
     {
         CollisionAssignment();
         if (colliderEntry)

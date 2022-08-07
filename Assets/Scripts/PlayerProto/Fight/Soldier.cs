@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -15,6 +16,7 @@ public class Soldier : MonoBehaviour
     [FormerlySerializedAs("dashAttackDistance")] 
     [SerializeField] private float distanceCharged;
     [SerializeField] private float chargeSpeed;
+    [SerializeField] private float staySecondsAfterDash;
 
     [Space] [Header("Property")] 
     [SerializeField] private float dashChargeTime;
@@ -42,21 +44,18 @@ public class Soldier : MonoBehaviour
     void Update()
     {
         collided = collision.collided;
+        IndicateEnemy(GetNearEnemy(distanceNoCharge));
         if (Input.GetButtonDown("Fire1"))
         {
-            /*var info = Physics2D.OverlapCircle(transform.position, dashAttackDistance, enemyMask);
-            if (info)
-            {
-                StartCoroutine(DashTo(info.gameObject, speedAfterDash));
-            }*/
             StartCoroutine(ChargeTimer());
         }
     }
     
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(rangeIndicator.position, distanceCharged);
-        Gizmos.DrawWireSphere(rangeIndicator.position, distanceNoCharge);
+        var position = rangeIndicator.position;
+        Gizmos.DrawWireSphere(position, distanceCharged);
+        Gizmos.DrawWireSphere(position, distanceNoCharge);
     }
 
 /*
@@ -87,10 +86,11 @@ public class Soldier : MonoBehaviour
 
     IEnumerator ChargeTimer()
     {
+        //很短的时间之内 直接释放
         yield return new WaitForSeconds(dashChargeTime);
         if (!Input.GetButton("Fire1"))
         {
-            print("直接释放");
+            QuickDash(GetNearEnemy(distanceNoCharge));
             yield break;
         }
         
@@ -121,5 +121,56 @@ public class Soldier : MonoBehaviour
         print("充能完成后释放");
         yield break;
         
+    }
+
+    private void QuickDash(Collider2D target)
+    {
+        if (!target) return;
+        Vector2 targetPos = target.transform.position;
+        Vector2 selfPos = transform.position;
+        Vector2 direction = targetPos - selfPos;
+        float posFix = GetComponent<CapsuleCollider2D>().size.x + target.bounds.size.x;
+        posFix /= 1.7f;
+        direction += (direction.normalized * posFix);
+        transform.position = transform.position + (Vector3)direction;
+        
+        StayInAir(staySecondsAfterDash);
+    }
+
+    private Collider2D GetNearEnemy(float searchRadius)
+    {
+        var position = rangeIndicator.position;
+        var info = Physics2D.OverlapCircle(position, searchRadius, enemyMask);
+        return info ? info : null;
+    }
+
+    private void IndicateEnemy(Collider2D info)
+    {
+        EnemyIndicator indicator = GetComponentInChildren<EnemyIndicator>();
+        if (!info)
+        {
+            indicator.HideIndicator();
+            return;
+        }
+        float arrowVerOffset = 0.3f;
+        indicator.transform.position = info.transform.position + new Vector3(0, arrowVerOffset);
+        indicator.ShowIndicator();
+    }
+
+    private void StayInAir(float seconds)
+    {
+        StartCoroutine(StayForSeconds(seconds));
+    }
+    IEnumerator StayForSeconds(float seconds)
+    {
+        float g = rb.gravityScale;
+        movement.useNormalWalk = false;
+        rb.gravityScale = 0;
+        rb.velocity=Vector2.zero;
+        yield return new WaitForSeconds(seconds);
+        rb.gravityScale = g;
+        movement.useNormalWalk = true;
+
+        yield break;
     }
 }

@@ -22,7 +22,7 @@ public class Movement : MonoBehaviour
     [SerializeField] private bool isWalking;
     [SerializeField] private int jumpCount;
     [SerializeField] private bool wallGrab;
-    [SerializeField] private bool useNormalWalk;
+    public bool useNormalWalk;
 
     private float inputX, inputY;
     private Vector2 finalVelocity;

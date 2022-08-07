@@ -9,12 +9,13 @@ public class BetterJump : MonoBehaviour
     [SerializeField] private float fallDownMultiple;
     [SerializeField] private float looseJumpMultiple;
     private Collision collision;
-
+    private Movement movement;
     private Rigidbody2D rb;
     private float gravity=-9.81f;
     // Start is called before the first frame update
     void Start()
     {
+        movement = GetComponent<Movement>();
         collision = GetComponent<Collision>();
         rb = GetComponent<Rigidbody2D>();
     }
@@ -22,6 +23,11 @@ public class BetterJump : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!movement.useNormalWalk)
+        {
+            return;
+        }
+        
         if (rb.velocity.y<0)
         {
             Vector2 v = rb.velocity;
