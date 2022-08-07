@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -21,17 +22,21 @@ public class Soldier : MonoBehaviour
     [Space] [Header("Property")] 
     [SerializeField] private float dashChargeTime;
 
+    [FormerlySerializedAs("centerPosition")] [SerializeField] private Transform centerTransform;
+
     private LayerMask enemyMask;
     private bool collided;
 
     private Movement movement;
     private Rigidbody2D rb;
     private Collision collision;
+    private CinemachineImpulseSource impulseSource;
 
     private float currentChargeRadius;
     // Start is called before the first frame update
     void Start()
     {
+        impulseSource = GetComponent<CinemachineImpulseSource>();
         collision = GetComponent<Collision>();
         rb = GetComponent<Rigidbody2D>();
         movement = GetComponent<Movement>();
@@ -44,8 +49,11 @@ public class Soldier : MonoBehaviour
     void Update()
     {
         collided = collision.collided;
-        IndicateEnemy(GetNearEnemy(distanceNoCharge));
-        if (Input.GetButtonDown("Fire1"))
+        if(!Input.GetButton("Debug Previous"))
+        {
+            IndicateEnemy(GetNearEnemy(distanceNoCharge));
+        }
+        if (Input.GetButtonDown("Debug Previous"))
         {
             StartCoroutine(ChargeTimer());
         }
@@ -58,39 +66,15 @@ public class Soldier : MonoBehaviour
         Gizmos.DrawWireSphere(position, distanceNoCharge);
     }
 
-/*
-    IEnumerator DashTo(GameObject target,float speed)
-    {
-        Vector2 tarPos, pos;
-        tarPos = target.transform.position;
-        pos = transform.position;
-        while (Vector2.Distance(tarPos,pos) > 0.5f)
-        {
-            tarPos = target.transform.position;
-            pos = transform.position;
-            movement.SetMove(false);
-            Vector2 direction = tarPos - pos;
-            direction.Normalize();
-            transform.position =(Vector3)(direction * speed * Time.deltaTime)+ transform.position;
-            yield return null;
-        }
-
-        var dp = tarPos - pos;
-        transform.position = transform.position + (Vector3)(dp * 2.2f);
-        rb.velocity = dp.normalized * dashSpeed;
-        yield return new WaitUntil(() => collided);
-        movement.SetMove(true);
-        yield break;
-    }
-*/
-
     IEnumerator ChargeTimer()
     {
         //很短的时间之内 直接释放
         yield return new WaitForSeconds(dashChargeTime);
-        if (!Input.GetButton("Fire1"))
+        if (!Input.GetButton("Debug Previous"))
         {
             QuickDash(GetNearEnemy(distanceNoCharge));
+            impulseSource.m_DefaultVelocity = new Vector3(-0.06f, -0.06f, 0);
+            impulseSource.GenerateImpulse();
             yield break;
         }
         
@@ -105,32 +89,50 @@ public class Soldier : MonoBehaviour
             yield return 0;
             currentChargeRadius += Time.deltaTime * chargeSpeed;
             rangeIndicator.localScale = new Vector3(currentChargeRadius * 2, currentChargeRadius * 2);
-            if (currentChargeRadius>=distanceCharged)
+            IndicateEnemy(GetNearEnemy(currentChargeRadius));
+            Time.timeScale = 0.2f;
+
+            if (currentChargeRadius>=distanceCharged)  //充满 直接退出该循环
             {
                 break;
             }
-            if (Input.GetButtonUp("Fire1"))
+            if (Input.GetButtonUp("Debug Previous"))
             {
-                print("充能过程中释放");
+                Time.timeScale = 1;
+                impulseSource.m_DefaultVelocity = new Vector3(-0.09f, -0.09f, 0);
+                impulseSource.GenerateImpulse();
+                //充能过程中释放
                 rangeIndicator.gameObject.SetActive(false);
+                QuickDash(GetNearEnemy(currentChargeRadius));
                 yield break;
             }
         }
-        yield return new WaitUntil(() => Input.GetButtonUp("Fire1"));
-        rangeIndicator.gameObject.SetActive(false);
-        print("充能完成后释放");
-        yield break;
         
+        while (true)
+        {
+            if (Input.GetButtonUp("Debug Previous"))  //松手 发射
+            {
+                Time.timeScale = 1f;
+                rangeIndicator.gameObject.SetActive(false);
+                break;
+            }
+            IndicateEnemy(GetNearEnemy(distanceCharged));
+            yield return 0;
+        }
+        // print("充能完成后释放");
+        impulseSource.m_DefaultVelocity = new Vector3(-0.35f, -0.35f, 0);
+        impulseSource.GenerateImpulse();
+        QuickDash(GetNearEnemy(distanceCharged));
     }
 
     private void QuickDash(Collider2D target)
     {
         if (!target) return;
         Vector2 targetPos = target.transform.position;
-        Vector2 selfPos = transform.position;
+        Vector2 selfPos = centerTransform.position;
         Vector2 direction = targetPos - selfPos;
         float posFix = GetComponent<CapsuleCollider2D>().size.x + target.bounds.size.x;
-        posFix /= 1.7f;
+        posFix /= 2f;
         direction += (direction.normalized * posFix);
         transform.position = transform.position + (Vector3)direction;
         
@@ -152,7 +154,7 @@ public class Soldier : MonoBehaviour
             indicator.HideIndicator();
             return;
         }
-        float arrowVerOffset = 0.3f;
+        float arrowVerOffset = 0.6f;
         indicator.transform.position = info.transform.position + new Vector3(0, arrowVerOffset);
         indicator.ShowIndicator();
     }
