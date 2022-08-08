@@ -22,6 +22,16 @@ public class Soldier : MonoBehaviour
     [Space] [Header("Property")] 
     [SerializeField] private float dashChargeTime;
 
+    [Header("Value")]
+    [SerializeField]
+    private float dashAttackPower;
+
+    [Header("Anger System")]
+    [SerializeField] private float maxAngerValue = 100f;
+    [SerializeField] private float currentAnger;
+    [SerializeField] private float dashConsume;
+    [SerializeField] private float normalAttackGenerate;
+
     [FormerlySerializedAs("centerPosition")] [SerializeField] private Transform centerTransform;
 
     private LayerMask enemyMask;
@@ -43,6 +53,8 @@ public class Soldier : MonoBehaviour
         enemyMask=LayerMask.GetMask("Enemy");
         
         rangeIndicator.gameObject.SetActive(false);
+
+        currentAnger = 0;
     }
 
     // Update is called once per frame
@@ -72,9 +84,7 @@ public class Soldier : MonoBehaviour
         yield return new WaitForSeconds(dashChargeTime);
         if (!Input.GetButton("Debug Previous"))
         {
-            QuickDash(GetNearEnemy(distanceNoCharge));
-            impulseSource.m_DefaultVelocity = new Vector3(-0.06f, -0.06f, 0);
-            impulseSource.GenerateImpulse();
+            QuickDash(GetNearEnemy(distanceNoCharge),0.06f);
             yield break;
         }
         
@@ -99,11 +109,10 @@ public class Soldier : MonoBehaviour
             if (Input.GetButtonUp("Debug Previous"))
             {
                 Time.timeScale = 1;
-                impulseSource.m_DefaultVelocity = new Vector3(-0.09f, -0.09f, 0);
-                impulseSource.GenerateImpulse();
                 //充能过程中释放
                 rangeIndicator.gameObject.SetActive(false);
-                QuickDash(GetNearEnemy(currentChargeRadius));
+                QuickDash(GetNearEnemy(currentChargeRadius) ,
+                    Mathf.Lerp(0.06f,0.15f,currentChargeRadius/distanceCharged));
                 yield break;
             }
         }
@@ -120,14 +129,15 @@ public class Soldier : MonoBehaviour
             yield return 0;
         }
         // print("充能完成后释放");
-        impulseSource.m_DefaultVelocity = new Vector3(-0.35f, -0.35f, 0);
-        impulseSource.GenerateImpulse();
-        QuickDash(GetNearEnemy(distanceCharged));
+        QuickDash(GetNearEnemy(distanceCharged) ,0.35f);
     }
 
-    private void QuickDash(Collider2D target)
+    private void QuickDash(Collider2D target ,float impulsePower)
     {
         if (!target) return;
+        impulseSource.m_DefaultVelocity = new Vector3(impulsePower, impulsePower, 0);
+        impulseSource.GenerateImpulse();
+        
         Vector2 targetPos = target.transform.position;
         Vector2 selfPos = centerTransform.position;
         Vector2 direction = targetPos - selfPos;
@@ -135,8 +145,15 @@ public class Soldier : MonoBehaviour
         posFix /= 2f;
         direction += (direction.normalized * posFix);
         transform.position = transform.position + (Vector3)direction;
-        
+        HurtEnemy(target,dashAttackPower);
+                
         StayInAir(staySecondsAfterDash);
+    }
+
+    private void HurtEnemy(Collider2D enemyInfo, float hurtValue)
+    {
+        EnemyProperty enemyInterface = enemyInfo.GetComponent<EnemyProperty>();
+        enemyInterface.EnemyTakeDamage(hurtValue);
     }
 
     private Collider2D GetNearEnemy(float searchRadius)
