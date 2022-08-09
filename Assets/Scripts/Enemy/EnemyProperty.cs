@@ -8,9 +8,12 @@ public class EnemyProperty : MonoBehaviour
     [SerializeField] private float currentLife;
 
     private SpriteRenderer renderer;
+
+    private BloodDisplay display;
     // Start is called before the first frame update
     void Start()
     {
+        display = GetComponent<BloodDisplay>();
         renderer = GetComponent<SpriteRenderer>();
         currentLife = maxLife;
     }
@@ -29,6 +32,7 @@ public class EnemyProperty : MonoBehaviour
     {
         currentLife -= damage;
         StartCoroutine(HurtFlash());
+        display.ChangeBloodTo(currentLife);
     }
 
     private void EnemyDie()
@@ -45,5 +49,10 @@ public class EnemyProperty : MonoBehaviour
             renderer.material.SetFloat("_FlashAmount", 0);
             yield return new WaitForSeconds(0.06f);
         }
+    }
+
+    public float GetEnemyMaxLife()
+    {
+        return maxLife;
     }
 }
