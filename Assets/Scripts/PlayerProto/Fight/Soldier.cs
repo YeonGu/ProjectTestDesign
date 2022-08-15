@@ -26,13 +26,15 @@ public class Soldier : MonoBehaviour
     [SerializeField]
     private float dashAttackPower;
 
+    public float slashAttackPower;
+
     [Header("Anger System")]
     [SerializeField] private float maxAngerValue = 100f;
     [SerializeField] private float currentAnger;
     [SerializeField] private float dashConsume;
     [SerializeField] private float normalAttackGenerate;
-
-    [FormerlySerializedAs("centerPosition")] [SerializeField] private Transform centerTransform;
+    [FormerlySerializedAs("centerPosition")] 
+    [SerializeField] private Transform centerTransform;
 
     private LayerMask enemyMask;
     private bool collided;
@@ -41,11 +43,13 @@ public class Soldier : MonoBehaviour
     private Rigidbody2D rb;
     private Collision collision;
     private CinemachineImpulseSource impulseSource;
+    private SpriteRenderer renderer;
 
     private float currentChargeRadius;
     // Start is called before the first frame update
     void Start()
     {
+        renderer = GetComponent<SpriteRenderer>();
         impulseSource = GetComponent<CinemachineImpulseSource>();
         collision = GetComponent<Collision>();
         rb = GetComponent<Rigidbody2D>();
@@ -191,5 +195,15 @@ public class Soldier : MonoBehaviour
         movement.useNormalWalk = true;
 
         yield break;
+    }
+    IEnumerator HurtFlash()
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            renderer.material.SetFloat("_FlashAmount", 1f);
+            yield return new WaitForSeconds(0.06f);
+            renderer.material.SetFloat("_FlashAmount", 0);
+            yield return new WaitForSeconds(0.06f);
+        }
     }
 }
