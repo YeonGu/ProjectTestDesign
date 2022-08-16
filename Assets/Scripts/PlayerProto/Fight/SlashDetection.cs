@@ -39,6 +39,7 @@ public class SlashDetection : MonoBehaviour
     // ==================================================================
     //ANIMATION EVENTS
     //自毁 event
+    
     private void EndSelf()
     {
         gameObject.SetActive(false);
