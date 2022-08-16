@@ -1932,6 +1932,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 46335729}
+  - component: {fileID: 46335730}
   m_Layer: 0
   m_Name: Center
   m_TagString: Untagged
@@ -1955,6 +1956,19 @@ Transform:
   m_Father: {fileID: 1075624437}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &46335730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 46335728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ac8827677810184eba2b5f23b30ad5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackReady: 0
 --- !u!1 &170958987
 GameObject:
   m_ObjectHideFlags: 0
@@ -6954,7 +6968,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.56724834, y: 0}
+  m_Offset: {x: 0.62370086, y: 0.02508998}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0.5}
@@ -6965,7 +6979,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.1344967, y: 0.8}
+  m_Size: {x: 1.2474017, y: 1.1763506}
   m_EdgeRadius: 0
 --- !u!114 &379341566
 MonoBehaviour:
@@ -13112,8 +13126,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rangeIndicator: {fileID: 1568277380}
-  normalAttackDistance: 0
-  speedAfterDash: 10
   distanceNoCharge: 2
   distanceCharged: 3
   chargeSpeed: 10
@@ -13121,6 +13133,7 @@ MonoBehaviour:
   dashChargeTime: 0.1
   dashAttackPower: 5
   slashAttackPower: 3
+  slashAttackCD: 0.5
   maxAngerValue: 100
   currentAnger: 0
   dashConsume: 30
@@ -13178,7 +13191,7 @@ MonoBehaviour:
     m_DissipationMode: 2
     m_DissipationDistance: 100
     m_PropagationSpeed: 343
-  m_DefaultVelocity: {x: 0.35, y: 0.35, z: 0}
+  m_DefaultVelocity: {x: 0.06, y: 0.06, z: 0}
 --- !u!1 &1280773697
 GameObject:
   m_ObjectHideFlags: 0
