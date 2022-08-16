@@ -34,20 +34,22 @@ public class SlashDetection : MonoBehaviour
             enemyInterface.EnemyTakeDamage(playerInterface.slashAttackPower);
             return;
         }
-        /*switch (other.tag)
-        {
-            case "Enemy":
-                EnemyProperty enemyProperty = other.GetComponent<EnemyProperty>();
-                enemyProperty.EnemyTakeDamage(player.slashAttackPower);
-                break;
-            default:
-                    break;
-        }*/
     }
     
+    // ==================================================================
+    //ANIMATION EVENTS
     //自毁 event
     private void EndSelf()
     {
         gameObject.SetActive(false);
     }
+
+    private void StartCd()
+    {
+        Soldier valueSet = transform.root.GetComponent<Soldier>();
+        float cd = valueSet.slashAttackCD;
+        SlashControl controller = transform.parent.GetComponent<SlashControl>();
+        controller.SetCd();
+    }
+    
 }

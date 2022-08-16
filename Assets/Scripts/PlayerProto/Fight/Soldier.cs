@@ -11,8 +11,7 @@ public class Soldier : MonoBehaviour
     [SerializeField] private Transform rangeIndicator;
 
     [Header("Ability")] 
-    [SerializeField] private float normalAttackDistance;
-    [SerializeField] private float speedAfterDash;
+    // [SerializeField] private float speedAfterDash;
     [SerializeField] private float distanceNoCharge;
     [FormerlySerializedAs("dashAttackDistance")] 
     [SerializeField] private float distanceCharged;
@@ -23,12 +22,11 @@ public class Soldier : MonoBehaviour
     [SerializeField] private float dashChargeTime;
 
     [Header("Value")]
-    [SerializeField]
-    private float dashAttackPower;
+    [SerializeField] private float dashAttackPower;
+                     public float slashAttackPower;
+                     public float slashAttackCD = 0.5f;
 
-    public float slashAttackPower;
-
-    [Header("Anger System")]
+                     [Header("Anger System")]
     [SerializeField] private float maxAngerValue = 100f;
     [SerializeField] private float currentAnger;
     [SerializeField] private float dashConsume;
