@@ -12,6 +12,7 @@ public class SlashControl : MonoBehaviour
     void Start()
     {
         attackReady = true;
+        float ix = Input.GetAxis("Horizontal");
     }
 
     // Update is called once per frame
@@ -19,6 +20,13 @@ public class SlashControl : MonoBehaviour
     {
         if (Input.GetButtonDown("Fire2") && attackReady)
         {
+            Vector3 scale = new Vector3(1, 1, 1);
+            SpriteRenderer playerRender = transform.root.GetComponent<SpriteRenderer>();
+            if (playerRender.flipX)
+                scale.x = -1;
+            else
+                scale.x = 1;
+            transform.localScale = scale;
             transform.GetChild(0).gameObject.SetActive(true);
         }
     }
